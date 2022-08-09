@@ -20,6 +20,7 @@
 #define ERR_PM_SUS_WARN     0x09
 #define ERR_ESPIRESET       0x0A
 #define ERR_BOARDID_READ    0x0B
+#define ERR_PWR_OK          0x0C
 #define ERR_PM_SLP_SUS      0x0D
 #define ERR_PMIC_INIT       0x10
 #define ERR_THRM_PWR_OFF    0x15

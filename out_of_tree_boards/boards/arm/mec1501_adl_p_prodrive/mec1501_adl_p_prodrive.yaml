@@ -1,0 +1,25 @@
+#
+# Copyright (c) 2022, Intel Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+identifier: mec1501_adl_p_prodrive
+name: MEC1501 ADL_P
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+ram: 32
+flash: 224
+supported:
+  - adc
+  - counter
+  - espi
+  - gpio
+  - i2c
+  - pinmux
+  - pwm
+  - watchdog
+  - peci
+  - sensor

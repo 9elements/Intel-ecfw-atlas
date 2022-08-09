@@ -34,6 +34,13 @@ target_sources_ifdef(CONFIG_BOARD_MEC1728_MTL_S app
     ${CMAKE_CURRENT_LIST_DIR}/microchip/mtl_s_mec1728.h
     )
 
+target_sources_ifdef(CONFIG_BOARD_MEC1501_ADL_P_PRODRIVE app
+    PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/microchip/adl_p_prodrive_mec1501.c
+    PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}/microchip/adl_p_prodrive_mec1501.h
+    )
+
 target_include_directories(app
     PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}

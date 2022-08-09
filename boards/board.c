@@ -22,6 +22,7 @@ LOG_MODULE_REGISTER(board, CONFIG_BOARD_LOG_LEVEL);
 static uint16_t plat_data;
 static uint16_t io_data;
 
+#ifdef CONFIG_BOARD_ID_IO_EXPANDER
 static inline int read_rvp_board_id(uint8_t *data)
 {
 	int ret = 0;
@@ -36,6 +37,7 @@ static inline int read_rvp_board_id(uint8_t *data)
 
 	return ret;
 }
+#endif
 
 int read_board_id(void)
 {

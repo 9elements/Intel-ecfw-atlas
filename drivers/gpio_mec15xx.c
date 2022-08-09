@@ -81,7 +81,7 @@ static int validate_device(uint32_t port_pin, struct gpio_port_pin *pp)
 	}
 
 	if (!ports[port_idx].port) {
-		LOG_ERR("Invalid gpio dev");
+		LOG_ERR("Invalid gpio: port in: %d port: %p pin: %d", port_idx, ports[port_idx].port, pin);
 		return -ENODEV;
 	}
 
