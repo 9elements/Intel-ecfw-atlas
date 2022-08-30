@@ -29,8 +29,8 @@
 /* 6s */
 #define PM_SLP_SUS_TIMEOUT          60000
 
-/* 10 s */
-#define PWR_OK_TIMEOUT              100000
+/* 6 s */
+#define PWR_OK_TIMEOUT              60000
 
 /* No time out for power sequence signals */
 #define PWR_SEQ_TIMEOUT_FOREVER	    WAIT_TIMEOUT_FOREVER

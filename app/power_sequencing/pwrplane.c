@@ -849,18 +849,25 @@ static int power_on(void)
 		return ret;
 	}
 
+	//LOG_DBG("Waiting for ALL_SYS_PWRGD to go HIGH");
+	//ret = wait_for_pin(ALL_SYS_PWRGD,
+	//		TIMEOUT_TO_US(sw_strps()->timeouts.all_sys_pwrg),
+	//		1);
+	//if (ret) {
+	//	pwrseq_error(ERR_ALL_SYS_PWRGD);
+	//	LOG_ERR("ALL_SYS_PWRGD timed out\n");
+	//	return ret;
+	//}
 
-	LOG_DBG("Waiting for ALL_SYS_PWRGD to go HIGH");
-	ret = wait_for_pin(ALL_SYS_PWRGD,
-			   TIMEOUT_TO_US(sw_strps()->timeouts.all_sys_pwrg),
-			   1);
+	// we need a 60 seconds timeout. wait_for_pin() timeout is max 16 bits, therefore just put in loop
+	for (int i = 0; i < 10; i++) {
+		ret = wait_for_pin(PWR_OK, PWR_OK_TIMEOUT, 1);
+	}
 	if (ret) {
-		pwrseq_error(ERR_ALL_SYS_PWRGD);
-		LOG_ERR("ALL_SYS_PWRGD timed out\n");
-		return ret;
+		LOG_WRN("PWR_OK still not received after 60 seconds");
 	}
 
-	LOG_DBG("ALL_SYS_PWRGD is HIGH");
+	//LOG_DBG("ALL_SYS_PWRGD is HIGH");
 	k_busy_wait(VR_ON_RAMP_DELAY_US);
 
 #ifdef VCCST_PWRGD
