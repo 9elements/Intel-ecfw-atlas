@@ -15,6 +15,8 @@
 #include "pwrplane.h"
 #include "task_handler.h"
 #include "softstrap.h"
+#include "vpd_section.h"
+
 LOG_MODULE_REGISTER(ecfw, CONFIG_EC_LOG_LEVEL);
 
 void main(void)
@@ -47,6 +49,12 @@ void main(void)
 		LOG_ERR("Failed to init board %d", ret);
 		return;
 	}
+
+    /*
+     * setup EMI in order to extract, store
+     * and share VPDs with the host CPU.
+     * */
+    expose_vpd_section();
 
 	strap_init();
 	start_all_tasks();

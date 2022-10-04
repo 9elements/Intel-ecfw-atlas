@@ -25,6 +25,9 @@ LOG_MODULE_REGISTER(eeprom, CONFIG_EEPROM_LOG_LEVEL);
 #define OFS_MSB(word)  (((word & 0xFF00) >> 8))
 #define OFS_LSB(word)  (word & 0xFF)
 
+/* forward declared */
+static int memcpy_workaround(void *dest, void *src, const int len);
+
 /* EEPROM access for offset greater than 255.
  * Following the 4-bit device type identifier in the bits 3-1 of the device
  * slave address byte are bits A10, A9 and A8 which are the three MSB of the
@@ -138,7 +141,8 @@ int eeprom_write_block(uint16_t offset, uint8_t len, uint8_t *data)
 	}
 
 	buf[0] = OFS_LSB(offset);
-	ret = memcpys(&buf[1], data, len);
+    ret = memcpy_workaround(&buf[1], data, len);
+    // ret = memcpys(&buf[1], data, len);
 
 	if (ret) {
 		LOG_ERR("Fail during buffer copy: %d", ret);
@@ -155,4 +159,17 @@ int eeprom_write_block(uint16_t offset, uint8_t len, uint8_t *data)
 	k_msleep(EEPROM_WR_MSDELAY);
 
 	return ret;
+}
+
+/*
+ * This function solely exists because memcpys in eeprom_write_block
+ * calls __builtin___memcpy_chk which has an undefined reference for
+ * __memcpy_chk. Thus, we get a linker error when using eeprom_write_block
+ * */
+static int memcpy_workaround(void *dest, void *src, const int len) {
+
+    for(int i = 0; i < len; i++)
+        ((uint8_t*) dest)[i] = ((uint8_t*) src)[i];
+
+    return 0;
 }

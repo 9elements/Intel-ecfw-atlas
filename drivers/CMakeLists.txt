@@ -56,6 +56,7 @@ target_sources(app
     ${CMAKE_CURRENT_LIST_DIR}/i2c_hub.c
     ${CMAKE_CURRENT_LIST_DIR}/espi_hub.c
     ${CMAKE_CURRENT_LIST_DIR}/espioob_mngr.c
+    ${CMAKE_CURRENT_LIST_DIR}/emi.c
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/eeprom.h
     ${CMAKE_CURRENT_LIST_DIR}/i2c_hub.h
@@ -66,6 +67,7 @@ target_sources(app
     ${CMAKE_CURRENT_LIST_DIR}/led.h
     ${CMAKE_CURRENT_LIST_DIR}/vci.h
     ${CMAKE_CURRENT_LIST_DIR}/acpi.h
+    ${CMAKE_CURRENT_LIST_DIR}/emi.h
     )
 
 target_sources_ifdef(CONFIG_SOC_FAMILY_MEC app
