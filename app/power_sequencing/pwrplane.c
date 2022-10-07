@@ -414,7 +414,6 @@ static inline int pwrseq_task_init(void)
 #ifdef CONFIG_DNX_SUPPORT
 	dnx_handle_early_handshake();
 #endif
-
 	/* In MAF mode, manually send the SUS_ACK if automatic ACK
 	 * is diabled in the espi driver. This is because the SUS_WARN
 	 * isr event arrives before the ESPI callbacks are configured
@@ -859,6 +858,7 @@ static int power_on(void)
 	//	return ret;
 	//}
 
+#ifdef CONFIG_WAIT_FOR_PWROK
 	// we need a 60 seconds timeout. wait_for_pin() timeout is max 16 bits, therefore just put in loop
 	for (int i = 0; i < 10; i++) {
 		ret = wait_for_pin(PWR_OK, PWR_OK_TIMEOUT, 1);
@@ -866,6 +866,9 @@ static int power_on(void)
 	if (ret) {
 		LOG_WRN("PWR_OK still not received after 60 seconds");
 	}
+#else
+	LOG_WRN("Ignore PWR_OK");
+#endif
 
 	//LOG_DBG("ALL_SYS_PWRGD is HIGH");
 	k_busy_wait(VR_ON_RAMP_DELAY_US);

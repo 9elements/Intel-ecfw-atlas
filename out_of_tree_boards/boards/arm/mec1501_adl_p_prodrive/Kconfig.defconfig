@@ -51,4 +51,8 @@ config TACH_XEC
 	default y
 	depends on SENSOR
 
+config WAIT_FOR_PWROK
+	default y
+	bool "Enable waiting for PWROK"
+
 endif # BOARD_MEC1501_ADL_PRODRIVE
