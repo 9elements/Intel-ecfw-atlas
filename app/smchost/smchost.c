@@ -701,6 +701,7 @@ static void smchost_cmd_handler(uint8_t command)
 		host_cmd_default(command);
 		break;
 	}
+	LOG_DBG("smchost_cmd_handler called: %d", command);
 }
 
 static void handle_kb_backlight_pwm(void)

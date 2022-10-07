@@ -917,7 +917,7 @@ static int power_on(void)
 
 static void suspend(void)
 {
-	LOG_DBG("%s", __func__);
+	LOG_DBG("suspending");
 
 	gpio_write_pin(PCH_PWROK, 0);
 	gpio_write_pin(SYS_PWROK, 0);

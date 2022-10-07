@@ -152,6 +152,7 @@ static void host_warn_handler(uint32_t signal, uint32_t status)
 		} else {
 			LOG_WRN("No suspend handler registered");
 		}
+		LOG_INF("ESPI_VWIRE_SIGNAL_SUS_WARN: %d", status);
 		break;
 	case ESPI_VWIRE_SIGNAL_DNX_WARN:
 		hub.dnx_mode = status;
@@ -232,7 +233,7 @@ static void vwire_handler(const struct device *dev, struct espi_callback *cb,
 		case ESPI_VWIRE_SIGNAL_SLP_S3:
 		case ESPI_VWIRE_SIGNAL_SLP_S4:
 		case ESPI_VWIRE_SIGNAL_SLP_S5:
-			LOG_INF("SLP %d changed %d", event.evt_details,
+			LOG_INF("SLP %d changed %d", event.evt_details+3,
 				event.evt_data);
 			if (state_handler) {
 				state_handler(event.evt_details,
