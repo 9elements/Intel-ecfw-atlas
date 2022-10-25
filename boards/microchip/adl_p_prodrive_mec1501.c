@@ -138,6 +138,7 @@ struct gpio_ec_config mecc1501_cfg_sus[] =  {
 struct gpio_ec_config mecc1501_cfg_res[] =  {
 };
 
+#ifdef CONFIG_THERMAL_MANAGEMENT
 /**
  * @brief Fan device table.
  *
@@ -149,27 +150,17 @@ static struct fan_dev fan_tbl[] = {
 	{ PWM_CH_00,	TACH_CH_00 }, /* CPU Fan */
 };
 
-
-/**
- * @brief Thermal sensor table.
- *
- * This table lists the thermal sensors connected to the board and their
- * respective ACPI location field it is mapped to update the temperature value.
- */
-static struct therm_sensor therm_sensor_tbl[] = {};
-
-void board_therm_sensor_tbl_init(uint8_t *p_max_adc_sensors,
-		struct therm_sensor **p_therm_sensor_tbl)
-{
-	*p_therm_sensor_tbl = therm_sensor_tbl;
-	*p_max_adc_sensors = ARRAY_SIZE(therm_sensor_tbl);
-}
-
 void board_fan_dev_tbl_init(uint8_t *pmax_fan, struct fan_dev **pfan_tbl)
 {
 	*pfan_tbl = fan_tbl;
 	*pmax_fan = ARRAY_SIZE(fan_tbl);
 }
+
+void board_therm_sensor_list_init(uint8_t therm_sensors[])
+{
+	//TODO check for thermal sensors
+}
+#endif
 
 int board_init(void)
 {
