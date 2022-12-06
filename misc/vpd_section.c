@@ -20,14 +20,15 @@
 
 typedef struct __attribute__((__packed__)) vpd_section {
 
-    char part_number  [PAGESIZE];
-    char serial_number[PAGESIZE];
+    uint8_t part_number  [PAGESIZE];
+    uint8_t serial_number[PAGESIZE];
+    uint8_t profile      [PAGESIZE];
 
 } vpd_section_t;
 
 /* <--- globals ---> */
 
-static uint32_t shared_section[ sizeof(vpd_section_t) ] = { 0x0 };
+static uint8_t shared_section[ sizeof(vpd_section_t) ] = { 0x0 };
 
 /* <--- Exposed Functionality ---> */
 
