@@ -6,7 +6,6 @@ if BOARD_MEC1501_ADL_P_PRODRIVE
 config BOARD
 	default "mec1501_adl_p_prodrive"
 
-
 #PS/2 driver is compiled in terms of this flag.
 config ESPI_PERIPHERAL_8042_KBC
 	default n
@@ -54,5 +53,19 @@ config TACH_XEC
 config WAIT_FOR_PWROK
 	default y
 	bool "Enable waiting for PWROK"
+
+config WRITE_VPD
+  default n
+  bool "Let the ecfw inject P/N and profile into the EEPROM"
+
+config VPD_PN
+  default "AAAA-BBBB-CCCC"
+  string "Partnumber, 16 bytes max. Ignores terminating nullbyte."
+  depends on WRITE_VPD
+
+config VPD_PROFILE
+  default "A"
+  string "Customer profile, 16 bytes max. Ignores terminating nullbyte."
+  depends on WRITE_VPD
 
 endif # BOARD_MEC1501_ADL_PRODRIVE

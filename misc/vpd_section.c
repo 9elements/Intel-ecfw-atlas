@@ -47,6 +47,13 @@ void expose_vpd_section(void) {
     emi_configure_region(&emi, EMI_REGION_0, &rconf);
     uint8_t *base = (uint8_t*) emi.config->region_0_base;
 
+#ifdef CONFIG_WRITE_VPD
+
+    eeprom_write_block(EEPROM_VPD_OFFSET + offsetof(vpd_section_t, part_number), sizeof(CONFIG_VPD_PN)      - 1, CONFIG_VPD_PN);
+    eeprom_write_block(EEPROM_VPD_OFFSET + offsetof(vpd_section_t, profile),     sizeof(CONFIG_VPD_PROFILE) - 1, CONFIG_VPD_PROFILE);
+
+#endif
+
     for(uint16_t i = 0; i < sizeof(vpd_section_t); i += PAGESIZE)
         eeprom_read_block(EEPROM_VPD_OFFSET + i, PAGESIZE, base + i);
 }
