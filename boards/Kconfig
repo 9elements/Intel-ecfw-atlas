@@ -61,4 +61,12 @@ config MEC172X_AIC_HW_REV2
 	help
 	  Use MEC172x HW rev 2 gpio configuration
 
+config VPD_PN
+	string "Prodrive part-number"
+	default "XXXX-YYYY-ZZZZ"
+
+config VPD_PROFILE
+	string "Prodrive customer profile"
+	default "B"
+
 endmenu
