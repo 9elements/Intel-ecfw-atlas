@@ -18,7 +18,7 @@
 
 /* <--- structures, enums, etc. ---> */
 
-#define VPD_MAGIC     0x56504453  /* 'VPDS' */
+#define VPD_MAGIC     0x56504400  /* 'VPD'; ignore first byte in LE */
 #define VPD_REVISION  1
 
 struct __attribute__((__packed__)) vpd_section_header {
@@ -63,7 +63,7 @@ void expose_vpd_section(void) {
     struct vpd_section_header header;
     eeprom_read_block(EEPROM_VPD_OFFSET + offsetof(vpd_section_t, vpd_header), sizeof(header), (uint8_t *)&header);
 
-    if (header.magic != VPD_MAGIC) {
+    if ((header.magic & 0xFFFFFF00) != VPD_MAGIC) {
         header.magic = VPD_MAGIC;
         header.reserved = 0;
         header.revision = VPD_REVISION;
