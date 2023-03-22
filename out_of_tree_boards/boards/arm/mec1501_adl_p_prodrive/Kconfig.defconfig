@@ -54,18 +54,30 @@ config WAIT_FOR_PWROK
 	default y
 	bool "Enable waiting for PWROK"
 
-config WRITE_VPD
-  default n
-  bool "Let the ecfw inject P/N and profile into the EEPROM"
+config VPD_PROGRAM_EEPROM
+	bool "Program VPD data into EEPROM"
+	default n
+	help
+	  Enable to program specific VPD data into the EEPROM. This option
+	  should only be used to (re)provision the EEPROM, and must not be
+	  enabled for board-agnostic production firmware.
 
-config VPD_PN
-  default "AAAA-BBBB-CCCC"
-  string "Partnumber, 16 bytes max. Ignores terminating nullbyte."
-  depends on WRITE_VPD
+comment "VPD fields"
+	depends on VPD_PROGRAM_EEPROM
+
+config VPD_SERIAL_NUMBER
+	string "Prodrive VPD serial number"
+	depends on VPD_PROGRAM_EEPROM
+	default "TE-ST-SER-IAL"
+
+config VPD_PART_NUMBER
+	string "Prodrive VPD part number"
+	depends on VPD_PROGRAM_EEPROM
+	default "ONE-FAKE-PART.NUM"
 
 config VPD_PROFILE
-  default "A"
-  string "Customer profile, 16 bytes max. Ignores terminating nullbyte."
-  depends on WRITE_VPD
+	int "Prodrive VPD profile"
+	depends on VPD_PROGRAM_EEPROM
+	default 0
 
 endif # BOARD_MEC1501_ADL_PRODRIVE
