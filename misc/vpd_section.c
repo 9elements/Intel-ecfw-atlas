@@ -11,7 +11,14 @@
 #include "vpd_section.h"
 
 #include <logging/log.h>
-LOG_MODULE_REGISTER(vpd, CONFIG_EEPROM_LOG_LEVEL);
+#include <logging/log_core.h>
+
+/* Enable debug logging when programming the EEPROM for debugging purposes */
+#if defined(CONFIG_VPD_PROGRAM_EEPROM) && CONFIG_VPD_PROGRAM_EEPROM == 1
+LOG_MODULE_REGISTER(vpd, LOG_LEVEL_DBG);
+#else
+LOG_MODULE_REGISTER(vpd, LOG_LEVEL_ERR);
+#endif
 
 #define VPD_MAGIC	0x56504453  /* 'VPDS' */
 
@@ -57,6 +64,24 @@ union emi_eeprom_vpd {
 
 #define EEPROM_VPD_OFFSET	0x10
 
+#if defined(CONFIG_VPD_PROGRAM_EEPROM) && CONFIG_VPD_PROGRAM_EEPROM == 1
+
+static int _write_vpd(const uint8_t *data, uint16_t offset, uint16_t length)
+{
+	for (uint16_t i = 0; i < length; i++) {
+		if (eeprom_write_byte(EEPROM_VPD_OFFSET + offset + i, data[offset + i])) {
+			LOG_ERR("Could not write byte %u", offset + i);
+			return -1;
+		}
+	}
+	return 0;
+}
+
+#define write_vpd(_prog_vpd, _member)	_write_vpd(_prog_vpd.raw,	\
+		offsetof(union emi_eeprom_vpd, _member), sizeof(_prog_vpd._member))
+
+#endif
+
 void expose_vpd_section(void)
 {
 	static __attribute__((aligned(4))) union emi_eeprom_vpd vpd_shadow = { 0 };
@@ -80,7 +105,7 @@ void expose_vpd_section(void)
 
 #if defined(CONFIG_VPD_PROGRAM_EEPROM) && CONFIG_VPD_PROGRAM_EEPROM == 1
 
-	const union emi_eeprom_vpd example_vpd = {
+	const union emi_eeprom_vpd prog_vpd = {
 		.header = {
 			.magic = VPD_MAGIC,
 			.revision = VPD_LATEST_REVISION,
@@ -90,22 +115,29 @@ void expose_vpd_section(void)
 		.profile = CONFIG_VPD_PROFILE,
 	};
 
-	LOG_HEXDUMP_DBG(example_vpd.raw, sizeof(example_vpd.raw), "Programmed VPD:");
-
-	for (uint16_t i = 0; i < sizeof(example_vpd); i++) {
-		if (eeprom_write_byte(EEPROM_VPD_OFFSET + i, example_vpd.raw[i])) {
-			LOG_ERR("Could not write byte %u", i);
+	/* TODO: Handle programming failures? */
+	if (CONFIG_VPD_SERIAL_NUMBER[0] != '\0')
+		if (write_vpd(prog_vpd, serial_number))
 			return;
-		}
-	}
+
+	if (CONFIG_VPD_PART_NUMBER[0] != '\0')
+		if (write_vpd(prog_vpd, part_number))
+			return;
+
+	if (CONFIG_VPD_PROFILE != 0)
+		if (write_vpd(prog_vpd, profile))
+			return;
+
 #endif
 
 	for (uint16_t i = 0; i < sizeof(vpd_shadow); i++) {
 		if (eeprom_read_byte(EEPROM_VPD_OFFSET + i, &vpd_shadow.raw[i])) {
 			LOG_ERR("Could not read byte %u", i);
+			/* Invalidate the magic */
+			vpd_shadow.header.magic = 0;
 			return;
 		}
 	}
 
-	LOG_HEXDUMP_DBG(vpd_shadow.raw, sizeof(vpd_shadow.raw), "Read VPD:");
+	LOG_HEXDUMP_DBG(vpd_shadow.raw, sizeof(vpd_shadow.raw), "New VPD:");
 }

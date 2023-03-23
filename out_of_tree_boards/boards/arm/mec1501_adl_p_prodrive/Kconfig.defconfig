@@ -68,16 +68,22 @@ comment "VPD fields"
 config VPD_SERIAL_NUMBER
 	string "Prodrive VPD serial number"
 	depends on VPD_PROGRAM_EEPROM
-	default "TE-ST-SER-IAL"
+	default ""
+	help
+	  Serial number to program in VPD, leave empty to skip programming.
 
 config VPD_PART_NUMBER
 	string "Prodrive VPD part number"
 	depends on VPD_PROGRAM_EEPROM
-	default "ONE-FAKE-PART.NUM"
+	default ""
+	help
+	  Part number to program in VPD, leave empty to skip programming.
 
 config VPD_PROFILE
 	int "Prodrive VPD profile"
 	depends on VPD_PROGRAM_EEPROM
 	default 0
+	help
+	  Profile to program in VPD, use 0 to skip programming.
 
 endif # BOARD_MEC1501_ADL_PRODRIVE
