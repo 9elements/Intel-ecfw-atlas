@@ -62,6 +62,14 @@ config VPD_PROGRAM_EEPROM
 	  should only be used to (re)provision the EEPROM, and must not be
 	  enabled for board-agnostic production firmware.
 
+config VPD_PROGRAM_EVERYTHING
+	bool "Program ALL VPD settings"
+	depends on VPD_PROGRAM_EEPROM
+	default n
+	help
+	  Program the entire VPD, including the header and fields with
+	  empty/zero values. Use this to re-provision VPD without AET.
+
 comment "VPD fields"
 	depends on VPD_PROGRAM_EEPROM
 

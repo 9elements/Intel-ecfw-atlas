@@ -105,6 +105,7 @@ void expose_vpd_section(void)
 
 #if defined(CONFIG_VPD_PROGRAM_EEPROM) && CONFIG_VPD_PROGRAM_EEPROM == 1
 
+	/* TODO: Handle programming failures? */
 	const union emi_eeprom_vpd prog_vpd = {
 		.header = {
 			.magic = VPD_MAGIC,
@@ -115,7 +116,13 @@ void expose_vpd_section(void)
 		.profile = CONFIG_VPD_PROFILE,
 	};
 
-	/* TODO: Handle programming failures? */
+#if defined(CONFIG_VPD_PROGRAM_EVERYTHING) && CONFIG_VPD_PROGRAM_EVERYTHING == 1
+
+	if (write_vpd(prog_vpd, raw))
+		return;
+
+#else
+
 	if (CONFIG_VPD_SERIAL_NUMBER[0] != '\0')
 		if (write_vpd(prog_vpd, serial_number))
 			return;
@@ -128,7 +135,9 @@ void expose_vpd_section(void)
 		if (write_vpd(prog_vpd, profile))
 			return;
 
-#endif
+#endif	/* VPD_PROGRAM_EVERYTHING */
+
+#endif	/* VPD_PROGRAM_EEPROM */
 
 	for (uint16_t i = 0; i < sizeof(vpd_shadow); i++) {
 		if (eeprom_read_byte(EEPROM_VPD_OFFSET + i, &vpd_shadow.raw[i])) {
