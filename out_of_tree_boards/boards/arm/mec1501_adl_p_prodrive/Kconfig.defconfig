@@ -94,4 +94,10 @@ config VPD_PROFILE
 	help
 	  Profile to program in VPD, use 0 to skip programming.
 
+config EC_BOUNDARY_SCAN
+	bool "Enable JTAG Boundary Scan"
+	default y
+	help
+	  Enables JTAG boundary scan. EC UART2 cannot be used, if this option is enabled.
+
 endif # BOARD_MEC1501_ADL_PRODRIVE

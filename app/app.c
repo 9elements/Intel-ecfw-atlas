@@ -26,6 +26,10 @@ void main(void)
 	/* Delayed start for debug */
 	k_sleep(K_SECONDS(CONFIG_EC_DELAYED_BOOT));
 
+#ifdef CONFIG_EC_BOUNDARY_SCAN
+	ECS_REGS->DEBUG_CTRL = (MCHP_ECS_DCTRL_DBG_EN | MCHP_ECS_DCTRL_MODE_JTAG | MCHP_ECS_DCTRL_BSCAN_EN);
+#endif
+
 	/* In platform N-1 rework doesn't route SMC_RST to MECC card, causing
 	 * I2C glitches among other issues, add a delay to get postcodes
 	 * until HW WA is possible.
