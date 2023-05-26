@@ -93,6 +93,10 @@ uint8_t boot_mode_maf;
 
 static uint8_t shutdown_reason;
 
+static uint8_t hsid_read(void) {
+	return gpio_read_pin(EC_HSID_3) << 3 | gpio_read_pin(EC_HSID_2) << 2 | gpio_read_pin(EC_HSID_1) << 1 | gpio_read_pin(EC_HSID_0);
+}
+
 uint8_t read_shutdown_reason(void)
 {
 	return shutdown_reason;
@@ -626,6 +630,9 @@ void pwrseq_thread(void *p1, void *p2, void *p3)
 	pwrseq_task_init();
 	dsw_read_mode();
 
+	int hsid = hsid_read();
+	LOG_INF("HSID: %x\n", hsid);
+
 	while (true) {
 		k_msleep(period);
 
@@ -860,8 +867,9 @@ static int power_on(void)
 
 #ifdef CONFIG_WAIT_FOR_PWROK
 	// we need a 60 seconds timeout. wait_for_pin() timeout is max 16 bits, therefore just put in loop
+	uint8_t pwr_ok_exp_val = (hsid_read() < 2);
 	for (int i = 0; i < 10; i++) {
-		ret = wait_for_pin(PWR_OK, PWR_OK_TIMEOUT, 1);
+		ret = wait_for_pin(PWR_OK, PWR_OK_TIMEOUT, pwr_ok_exp_val);
 	}
 	if (ret) {
 		LOG_WRN("PWR_OK still not received after 60 seconds");

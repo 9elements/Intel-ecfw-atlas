@@ -90,6 +90,11 @@ extern uint8_t platformskutype;
 #define EC_PWRBTN_LED			EC_GPIO_156
 #define PWR_OK				EC_GPIO_121
 
+#define EC_HSID_3			EC_GPIO_107
+#define EC_HSID_2			EC_GPIO_112
+#define EC_HSID_1			EC_GPIO_113
+#define EC_HSID_0			EC_GPIO_120
+
 #define FAN_PWR_DISABLE_N		EC_DUMMY_GPIO_LOW
 #define VIRTUAL_BAT			EC_DUMMY_GPIO_LOW
 #define VIRTUAL_DOCK			EC_DUMMY_GPIO_LOW
