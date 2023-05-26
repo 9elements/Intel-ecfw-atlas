@@ -50,10 +50,6 @@ config TACH_XEC
 	default y
 	depends on SENSOR
 
-config WAIT_FOR_PWROK
-	default y
-	bool "Enable waiting for PWROK"
-
 config VPD_PROGRAM_EEPROM
 	bool "Program VPD data into EEPROM"
 	default n

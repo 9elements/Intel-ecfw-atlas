@@ -49,7 +49,7 @@ extern uint8_t platformskutype;
 #define PECI_MUX_CTRL			EC_GPIO_025
 #define SMC_LID				EC_GPIO_033
 #define PEG_PLI_N_DG2			EC_GPIO_036
-#define SYS_PWROK			EC_DUMMY_GPIO_HIGH
+#define SYS_PWROK			EC_GPIO_043
 #define PCA9555_0_R_INT_N		EC_GPIO_051
 #define STD_ADP_PRSNT			EC_GPIO_052
 

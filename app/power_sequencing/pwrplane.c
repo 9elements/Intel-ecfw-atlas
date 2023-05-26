@@ -43,6 +43,7 @@
 #ifdef CONFIG_DNX_SUPPORT
 #include "dnx.h"
 #endif
+#include "eeprom.h"
 
 LOG_MODULE_REGISTER(pwrmgmt, CONFIG_PWRMGT_LOG_LEVEL);
 
@@ -70,6 +71,7 @@ LOG_MODULE_REGISTER(pwrmgmt, CONFIG_PWRMGT_LOG_LEVEL);
  */
 #define CTYPE_NVDC	0x03
 #define PWR_PLANE_RSMRST_DELAY_MS	100
+#define VPD_PROFILE_OFFSET 0x4c
 
 /* Track power sequencing events */
 struct pwr_flags g_pwrflags;
@@ -855,28 +857,15 @@ static int power_on(void)
 		return ret;
 	}
 
-	//LOG_DBG("Waiting for ALL_SYS_PWRGD to go HIGH");
-	//ret = wait_for_pin(ALL_SYS_PWRGD,
-	//		TIMEOUT_TO_US(sw_strps()->timeouts.all_sys_pwrg),
-	//		1);
-	//if (ret) {
-	//	pwrseq_error(ERR_ALL_SYS_PWRGD);
-	//	LOG_ERR("ALL_SYS_PWRGD timed out\n");
-	//	return ret;
-	//}
-
-#ifdef CONFIG_WAIT_FOR_PWROK
-	// we need a 60 seconds timeout. wait_for_pin() timeout is max 16 bits, therefore just put in loop
-	uint8_t pwr_ok_exp_val = (hsid_read() < 2);
-	for (int i = 0; i < 10; i++) {
-		ret = wait_for_pin(PWR_OK, PWR_OK_TIMEOUT, pwr_ok_exp_val);
-	}
+	LOG_DBG("Waiting for ALL_SYS_PWRGD to go HIGH");
+	ret = wait_for_pin(ALL_SYS_PWRGD,
+			TIMEOUT_TO_US(sw_strps()->timeouts.all_sys_pwrg),
+			1);
 	if (ret) {
-		LOG_WRN("PWR_OK still not received after 60 seconds");
+		pwrseq_error(ERR_ALL_SYS_PWRGD);
+		LOG_ERR("ALL_SYS_PWRGD timed out\n");
+		return ret;
 	}
-#else
-	LOG_WRN("Ignore PWR_OK");
-#endif
 
 	//LOG_DBG("ALL_SYS_PWRGD is HIGH");
 	k_busy_wait(VR_ON_RAMP_DELAY_US);
@@ -888,7 +877,25 @@ static int power_on(void)
 		return ret;
 	}
 #endif
-	ret = gpio_write_pin(PCH_PWROK, 1);
+	uint16_t profile = 0;
+	if(eeprom_read_word(VPD_PROFILE_OFFSET, &profile)) {
+		LOG_WRN("Failed to read profile from eeprom\n");
+	}
+	profile = profile  >> 8 | profile << 8;
+	LOG_INF("Profile: %x\n", profile);
+
+	uint32_t pin_before_pwrok = PCH_PWROK;
+	uint32_t pin_after_pwrok = SYS_PWROK;
+
+	if (profile == 2) {
+		LOG_INF("Switching around SYS_PWROK and PCH_PWROK sequence\n");
+		pin_before_pwrok = SYS_PWROK;
+		pin_after_pwrok = PCH_PWROK;
+	} else {
+		LOG_INF("Not switching around SYS_PWROK and PCH_PWROK sequence\n");
+	}
+
+	ret = gpio_write_pin(pin_before_pwrok, 1);
 	if (ret) {
 		LOG_ERR("Failed to indicate eSPI master to run");
 		return ret;
@@ -896,7 +903,16 @@ static int power_on(void)
 
 	k_msleep(SYS_PWR_OK_DELAY);
 
-	ret = gpio_write_pin(SYS_PWROK, 1);
+	// we need a 60 seconds timeout. wait_for_pin() timeout is max 16 bits, therefore just put in loop
+	uint8_t pwr_ok_exp_val = (hsid_read() < 2);
+	for (int i = 0; i < 10; i++) {
+		ret = wait_for_pin(PWR_OK, PWR_OK_TIMEOUT, pwr_ok_exp_val);
+	}
+	if (ret) {
+		LOG_WRN("PWR_OK still not received after 60 seconds");
+	}
+
+	ret = gpio_write_pin(pin_after_pwrok, 1);
 	if (ret) {
 		LOG_ERR("Failed to indicate system power is ok");
 		return ret;

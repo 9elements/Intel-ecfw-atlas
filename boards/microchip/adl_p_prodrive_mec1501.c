@@ -44,8 +44,8 @@ struct gpio_ec_config mecc1501_cfg[] = {
 	/* Not used. It's connected to 3.3K pull-up */
 	{ PECI_MUX_CTRL,	GPIO_DISCONNECTED },
 	{ SMC_LID,		GPIO_INPUT  | GPIO_INT_EDGE_BOTH },
-	/* PCH SYS_PWROK is connected to Silego. Savings 0.100 mA */
-	{ EC_GPIO_043,		GPIO_DISCONNECTED },
+	/* PCH SYS_PWROK is connected to Silego and PWR_OK */
+	{ SYS_PWROK,		GPIO_OUTPUT_LOW | GPIO_OPEN_DRAIN },
 	{ EC_GPIO_050,		GPIO_INPUT },
 	/* IO expander 0, has nothing to be handled dynamically */
 	{ PCA9555_0_R_INT_N,	GPIO_DISCONNECTED },
